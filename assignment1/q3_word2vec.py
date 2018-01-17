@@ -15,7 +15,7 @@ def normalizeRows(x):
     """
 
     ### YOUR CODE HERE
-    raise NotImplementedError
+    x /= np.sqrt(np.sum(x*x,axis=1))[:,None]
     ### END YOUR CODE
 
     return x
@@ -58,7 +58,13 @@ def softmaxCostAndGradient(predicted, target, outputVectors, dataset):
     """
 
     ### YOUR CODE HERE
-    raise NotImplementedError
+    y0 = outputVectors.dot(predicted)
+    yHat = softmax(y0)
+    cost = -np.log(yHat[target])
+    gradY0 = np.copy(yHat)
+    gradY0[target] -= 1
+    gradPred = outputVectors.dot(gradY0)
+    grad = gradY0.dot(predicted.T)
     ### END YOUR CODE
 
     return cost, gradPred, grad
