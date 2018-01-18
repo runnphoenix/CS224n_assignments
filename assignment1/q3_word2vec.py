@@ -79,6 +79,7 @@ def getNegativeSamples(target, dataset, K):
         while newidx == target:
             newidx = dataset.sampleTokenIdx()
         indices[k] = newidx
+
     return indices
 
 
@@ -100,17 +101,23 @@ def negSamplingCostAndGradient(predicted, target, outputVectors, dataset,
     # wish to match the autograder and receive points!
     indices = [target]
     indices.extend(getNegativeSamples(target, dataset, K))
-
-    ### YOUR CODE HERE
-    cost1 = -np.log(sigmoid(outputVectors.T[target,:].dot(predicted)))
-    cost2 = 0
-    for k in range(K):
-        cost2 += np.log(sigmoid(-outputVectors.T[k,:].dot(predicted)))
-    cost = cost1 - cost2
     
-    #gradPred = 
+    ### YOUR CODE HERE
+    gradPred = np.zeros_like(predicted)
+    grad = np.zeros_like(outputVectors)
+    z = sigmoid(outputVectors[target,:].dot(predicted))
+    cost = -np.log(z)
+    
+    gradPred += (z - 1.0) * outputVectors[target,:]
+    
+    for k in indices[1:]:
+        cost -= np.log(sigmoid(-outputVectors[k,:].dot(predicted)))
+        gradPred -= (sigmoid(-outputVectors[k,:].dot(predicted)) - 1.0) * outputVectors[k,:]
+        grad[k,:] += -predicted * (sigmoid(-outputVectors[k,:].dot(predicted)) - 1.0)
+    
+    grad[target] = (z - 1.0) * predicted
     ### END YOUR CODE
-
+    
     return cost, gradPred, grad
 
 
@@ -148,7 +155,7 @@ def skipgram(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
 
     for word in contextWords:
         index = tokens[word]
-        cost_w, gradPred_w, gradOut_w = softmaxCostAndGradient(predicted, index, outputVectors, dataset)
+        cost_w, gradPred_w, gradOut_w = word2vecCostAndGradient(predicted, index, outputVectors, dataset)
         cost += cost_w
         gradIn[inputIndex] += gradPred_w
         gradOut += gradOut_w
