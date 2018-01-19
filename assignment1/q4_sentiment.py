@@ -49,7 +49,9 @@ def getSentenceFeatures(tokens, wordVectors, sentence):
     sentVector = np.zeros((wordVectors.shape[1],))
 
     ### YOUR CODE HERE
-    raise NotImplementedError
+    for word in sentence:
+        sentVector += wordVectors[tokens[word]]
+    sentVector /= len(sentence)
     ### END YOUR CODE
 
     assert sentVector.shape == (wordVectors.shape[1],)
@@ -63,7 +65,7 @@ def getRegularizationValues():
     """
     values = None   # Assign a list of floats in the block below
     ### YOUR CODE HERE
-    raise NotImplementedError
+    values = [1e-6,1e-5,0.0001,0.001,0.01,0.1]
     ### END YOUR CODE
     return sorted(values)
 
@@ -89,7 +91,12 @@ def chooseBestModel(results):
     bestResult = None
 
     ### YOUR CODE HERE
-    raise NotImplementedError
+    bestDevAccuracy = 0
+    for result in results:
+        devAccuracy = result["dev"]
+        if devAccuracy > bestDevAccuracy:
+            bestDevAccuracy = devAccuracy
+            bestResult = result
     ### END YOUR CODE
 
     return bestResult
@@ -163,6 +170,7 @@ def main(args):
 
     # Load the train set
     trainset = dataset.getTrainSentences()
+    
     nTrain = len(trainset)
     trainFeatures = np.zeros((nTrain, dimVectors))
     trainLabels = np.zeros((nTrain,), dtype=np.int32)
