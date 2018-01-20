@@ -27,7 +27,7 @@ def softmax(x):
     x_max = tf.expand_dims(tf.reduce_max(x, 1), 1)
     x -= x_max
     x_exp = tf.exp(x)
-    out = x_exp / tf.reduce_sum(x_exp, 1)
+    out = x_exp / tf.expand_dims(tf.reduce_sum(x_exp, 1), 1)
     ### END YOUR CODE
 
     return out
@@ -83,6 +83,11 @@ def test_softmax_basic():
     with tf.Session() as sess:
             test2 = sess.run(test2)
     test_all_close("Softmax test 2", test2, np.array([[0.73105858, 0.26894142]]))
+    
+    test3 = softmax(tf.constant(np.array([[1, 1],[2,2],[3,3],[4,4]]), dtype=tf.float32))
+    with tf.Session() as sess:
+        test3 = sess.run(test3)
+    test_all_close("Softmax test 2", test3, np.array([[0.5, 0.5],[0.5, 0.5],[0.5, 0.5],[0.5, 0.5]]))
 
     print "Basic (non-exhaustive) softmax tests pass\n"
 
