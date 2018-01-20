@@ -58,6 +58,10 @@ def cross_entropy_loss(y, yhat):
     """
 
     ### YOUR CODE HERE
+    float_y = tf.to_float(y)
+    log_yhat = -tf.log(yhat)
+    mul = tf.multiply(float_y, log_yhat)
+    out = tf.reduce_sum(mul)
     ### END YOUR CODE
 
     return out
