@@ -21,6 +21,18 @@ class PartialParse(object):
         self.sentence = sentence
 
         ### YOUR CODE HERE
+        self.stack = []
+        self.stack.append('ROOT')
+        
+        self.buffer = []
+        for word in sentence:
+          self.buffer.append(word)
+          
+        self.dependencies = []
+        
+        print self.stack
+        print self.buffer
+        print self.dependencies
         ### END YOUR CODE
 
     def parse_step(self, transition):
@@ -31,6 +43,19 @@ class PartialParse(object):
                         and right-arc transitions.
         """
         ### YOUR CODE HERE
+        if transition == 'S':
+          word = self.buffer.pop(0)
+          self.stack.append(word)
+        elif transition == 'LA':
+          word2 = self.stack.pop(-2)
+          word1 = self.stack[-1]
+          self.dependencies.append((word1, word2))
+        elif transition == 'RA':
+          word2 = self.stack.pop()
+          word1 = self.stack[-1]
+          self.dependencies.append((word1, word2))
+        else:
+          pass
         ### END YOUR CODE
 
     def parse(self, transitions):
