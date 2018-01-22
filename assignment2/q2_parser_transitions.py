@@ -68,7 +68,7 @@ class PartialParse(object):
         return self.dependencies
 
 
-def minibatch_parse(sentences, model, batch_size):
+def minibatch_parse(sentences, model, batch_size): #Ops
     """Parses a list of sentences in minibatches using a model.
 
     Args:
@@ -84,37 +84,15 @@ def minibatch_parse(sentences, model, batch_size):
                       Ordering should be the same as in sentences (i.e., dependencies[i] should
                       contain the parse for sentences[i]).
     """
-
-    ### YOUR CODE HERE
-    parses = []
-    for i in range(len(sentences)):
-      parses.append(PartialParse(sentences[i]))
-    unfinished_parses = parses
-        
-    counts=0
-    while(len(unfinished_parses)-counts > 0):
-      minibatch = []
-      if len(unfinished_parses)-counts >= batch_size:
-        counts+=batch_size
-        for i in range(batch_size):
-          minibatch.append(unfinished_parses[len(unfinished_parses)-counts+i])
-      elif len(unfinished_parses)-counts < batch_size:
-        for i in range(len(unfinished_parses)):
-          minibatch.append(unfinished_parses[len(unfinished_parses)-counts+i])
-          batch += len(unfinished_parses)
-      
-      while (len(minibatch) > 0):
-        transitions = model.predict(minibatch)
-        for i in range(len(minibatch)):
-          parse = minibatch[i]
-          parse.parse_step(transitions[i])
-        for parse in minibatch:
-          if len(parse.stack) == 1 and len(parse.buffer) == 0:
-            minibatch.remove(parse)
-      
-    dependencies = []
-    for p in unfinished_parses:
-      dependencies.append(p.dependencies)
+    partial_parses = [PartialParse(sent) for sent in sentences]
+    unfinished_parses = partial_parses[:]
+    while unfinished_parses:
+      minibatch = unfinished_parses[:batch_size]
+      transitions = model.predict(minibatch)
+      for i, sent in enumerate(minibatch):
+        sent.parse_step(transitions[i])
+      unfinished_parses = [i for i in partial_parses if len(i.stack) > 1 or len(i.buffer) > 0]
+    dependencies = [sent.dependencies for sent in partial_parses]
     ### END YOUR CODE
 
     return dependencies
