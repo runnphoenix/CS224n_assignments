@@ -97,9 +97,15 @@ def make_windowed_data(data, start, end, window_size = 1):
     windowed_data = []
     for sentence, labels in data:
     ### YOUR CODE HERE (5-20 lines)
-
+        windowed_sentence = [start for _ in range(window_size)] + sentence + [end for _ in range(window_size)]
+        for i in range(window_size, window_size+len(sentence)):
+            left_window = [windowed_sentence[i-j] for j in range(window_size,0,-1)]
+            right_window = [windowed_sentence[i+j] for j in range(1, 1+window_size)]
+            word_window = reduce(lambda a,b: a+b, left_window) + windowed_sentence[i] + reduce(lambda a,b: a+b, right_window)
+            windowed_data.append((word_window, labels[i-window_size]))
     ### END YOUR CODE
     return windowed_data
+
 
 class WindowModel(NERModel):
     """
@@ -153,7 +159,7 @@ class WindowModel(NERModel):
             feed_dict: The feed dictionary mapping from placeholders to values.
         """
         ### YOUR CODE HERE (~5-10 lines)
-         
+
         ### END YOUR CODE
         return feed_dict
 
@@ -174,9 +180,9 @@ class WindowModel(NERModel):
             embeddings: tf.Tensor of shape (None, n_window_features*embed_size)
         """
         ### YOUR CODE HERE (!3-5 lines)
-                                                             
-                                  
-                                                                                                                 
+
+
+
         ### END YOUR CODE
         return embeddings
 
@@ -225,7 +231,7 @@ class WindowModel(NERModel):
             loss: A 0-d tensor (scalar)
         """
         ### YOUR CODE HERE (~2-5 lines)
-                                   
+
         ### END YOUR CODE
         return loss
 
